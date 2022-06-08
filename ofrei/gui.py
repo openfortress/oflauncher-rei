@@ -126,6 +126,7 @@ class Ui_MainWindow(object):
                 except FileExistsError:
                     pass
             installed_revision = get_installed_revision(game_path)
+            versionDictionary = get_version_dictionary(url)
             try:
                 num_threads = get_threads(url)
                 latest_ver = get_latest_ver(url)
@@ -139,7 +140,7 @@ class Ui_MainWindow(object):
             print(version)
             if latest_ver != version:
                 errorMsg = QMessageBox()
-                errorMsg.setWindowTitle("out of date!")
+                errorMsg.setWindowTitle("Out of date!")
                 errorMsg.setText(
                     "This isn't the latest version! you need to download the latest version from the website.\nlatest "
                     "version: " + latest_ver)
@@ -218,13 +219,25 @@ class Ui_MainWindow(object):
 
 
 def get_threads(url):
-    r = httpx.get(url + "/reithreads")
+    r = httpx.get(url + "reithreads")
     return int(r.text)
 
 
 def get_latest_ver(url):
-    r = httpx.get(url + "/reiversion")
+    r = httpx.get(url + "reiversion")
     return r.text.strip()
+
+
+def get_version_dictionary(url):
+    goodDownload = False
+    while goodDownload == False:
+        try:
+            r = httpx.get(url + "cumlcache")
+            goodDownload = True
+        except httpx.HTTPStatusError as exc:
+            print("Failed to retrieve cumlcache, retrying...")
+            goodDownload = False
+    return json.loads(r.text)
 
 
 def work(arr):
@@ -236,7 +249,7 @@ def work(arr):
                 resp = arr[2].get(arr[0])
                 goodDownload = True
             except httpx.HTTPStatusError as exc:
-                print("HTTP Download error.  Retrying.")
+                print("HTTP Download error, retrying...")
                 goodDownload = False
 
         file = open(arr[1], "wb+")
