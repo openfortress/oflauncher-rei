@@ -1,3 +1,5 @@
+**ARCHIVE NOTICE**: Toast is toast. This repository will no longer be maintained.
+
 # oflauncher-rei
 Open Fortress frontend for the Toast.
 
